@@ -1,0 +1,82 @@
+body {
+    padding-top: 0px;
+}
+.alert-container {
+    margin-bottom: 20px;
+}
+#notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.link_notification {
+text-decoration: none !important;
+color:gray;
+font-size: 17px;
+font-weight: bold;
+padding-right: 20px;
+}
+
+.amain {
+    margin-right: 230px;
+    margin-top: 5px;
+}
+
+.amain1 {
+    margin-right: 75px;
+    margin-top: 5px;
+}
+
+.custom-file-input ~ .custom-file-label::after {
+    content: "Обзор";
+}
+
+.custom-file-input:lang(en) ~ .custom-file-label::after {
+    content: "Browse";
+}
+
+.custom-file-label::after {
+    border-left: 1px solid #dee2e6;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.custom-file-label {
+    height: calc(1.5em + .75rem + 2px);
+    line-height: 1.5;
+    padding: .375rem .75rem;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .amain {
+        margin-right: 0;
+    }
+
+    .form-inline .form-group {
+        display: block;
+        width: 100%;
+    }
+
+    .form-inline .form-group label,
+    .form-inline .form-group select,
+    .form-inline .form-group input,
+    .form-inline .form-group button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+    }
+}
+
+.logo-img {
+    max-height: 40px;
+    max-width: 40px;
+    margin-right: 10px;
+}
+
+
+
+

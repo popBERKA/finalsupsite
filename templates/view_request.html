@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block title %}Просмотр запроса{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <h1>Просмотр запроса</h1>
+        <hr class="my-3">
+        {% if current_user.role == 'admin' %}
+        <p><a href="{{ url_for('active_chats') }}" class="btn btn-success mb-3">В активные запросы</a> <a href="{{ url_for('admin_panel') }}" class="btn btn-primary mb-3">Во все запросы</a> <a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">На главную</a></p>
+        {% else %}
+        <p><a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">На главную</a></p>
+        {% endif %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h4>Информация о пользователе:</h4>
+                <hr class="my-3">
+                <p class="card-text"><strong>ФИО:</strong> {{ support_request.full_name }}</p>
+                <p class="card-text"><strong>Почта:</strong> {{ support_request.email }}</p>
+                <p class="card-text"><strong>Номер телефона:</strong> {{ support_request.phone_number }}</p>
+                <p class="card-text"><strong>Номер кабинета:</strong> {{ support_request.office_number }}</p>
+                <hr class="my-3">
+                <h5 class="card-text">Статус запроса: {{ support_request.status }}</h5>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Тема запроса: {{ support_request.subject }}</h5>
+                <hr class="my-3">
+                <p class="card-text">{{ support_request.message }}</p>
+                {% if support_request.files %}
+                <h5>Прикрепленные файлы:</h5>
+                <ul>
+                    {% for file in support_request.files %}
+                    <li><a href="{{ url_for('uploaded_file', filename=file.filename) }}" target="_blank">{{ file.filename }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        <h3>Комментарии</h3>
+        <ul class="list-group mt-3">
+            {% for comment in comments %}
+            <li class="list-group-item">
+                <p><strong>{{ comment.user.full_name }}</strong> at {{ comment.timestamp.strftime('%H:%M') }}</p>
+                <p>{{ comment.content }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% if support_request.status != 'Выполнен' %}
+            <form method="POST" action="{{ url_for('view_request', request_id=support_request.id) }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.content.label(class="form-control-label") }}
+                    {{ form.content(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }} 
+                </div>
+            </form>
+        {% else %}
+            <p class="text-muted">Этот запрос был закрыт. Комментарии невозможны.</p>
+        {% endif %}
+        {% if support_request.status != 'Выполнен' %}
+            <form method="POST" action="{{ url_for('close_request', request_id=support_request.id) }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">Закрыть запрос</button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

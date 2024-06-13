@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Компьютерный центр{% endblock %}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип" class="logo-img">
+            Компьютерный центр
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profile') }}">Профиль</a>
+                    </li>
+                    {% if current_user.role == 'admin' %}
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Уведомления (<span id="notification-count">0</span>)
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <ul id="notification-list" class="list-unstyled mb-0"></ul>
+                            <div class="dropdown-divider"></div>
+                            <button id="clear-notifications" class="dropdown-item">Очистить все уведомления</button>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Выход</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Вход</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">Регистрация</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('navbarDropdown').addEventListener('click', function() {
+            fetch('/notifications/{{ current_user.id }}')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationList = document.getElementById('notification-list');
+                    notificationList.innerHTML = '';
+                    data.forEach(notification => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('dropdown-item');
+                        listItem.innerHTML = `
+                            <a class="link_notification" href="${notification.url}">${notification.message}</a>
+                            <button class="btn btn-secondary mark-read" data-id="${notification.id}">Просмотрено</button>
+                        `;
+                        notificationList.appendChild(listItem);
+                    });
+                    document.querySelectorAll('.mark-read').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const notificationId = this.getAttribute('data-id');
+                            fetch(`/notifications/mark_read/${notificationId}`, {
+                                method: 'POST'
+                            }).then(() => {
+                                this.parentElement.remove();
+                                updateNotificationCount();
+                            });
+                        });
+                    });
+                });
+        });
+
+        document.getElementById('clear-notifications').addEventListener('click', function() {
+            fetch('/notifications/clear_all', {
+                method: 'POST'
+            }).then(() => {
+                document.getElementById('notification-list').innerHTML = '';
+                document.getElementById('notification-count').textContent = '0';
+            });
+        });
+
+        function updateNotificationCount() {
+            fetch('/notifications/{{ current_user.id }}')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('notification-count').textContent = data.length;
+                });
+        }
+
+        setInterval(updateNotificationCount, 5000); // Обновляем каждые 5 секунд
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var customFileInput = document.getElementById('customFile');
+            var customFileLabel = customFileInput.nextElementSibling;
+    
+            customFileInput.addEventListener('change', function () {
+                var fileName = customFileInput.files[0].name;
+                customFileLabel.textContent = fileName;
+            });
+        });
+    </script>
+</body>
+</html>

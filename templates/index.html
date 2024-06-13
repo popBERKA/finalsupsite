@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+    <div class="jumbotron">
+        {% if current_user.is_authenticated %}
+            {% if current_user.role == 'admin' %}
+                <h1 class="display-4">Панель администратора</h1>
+                <hr class="my-4">
+                <p class="lead">Чтобы управлять чатами и просматривать запросы нажми на "Активные запросы" или "Все запросы". Также можно управлять пользователями.</p>
+                <hr class="my-4">
+                <a class="btn btn-primary btn-lg" href="{{ url_for('admin_panel') }}" role="button">Все запросы</a>
+                <a class="btn btn-success btn-lg" href="{{ url_for('active_chats') }}" role="button">Активные запросы</a>
+                <a class="btn btn-info btn-lg" href="{{ url_for('user_management') }}" role="button">Пользователи</a>
+            {% else %}
+                <h1 class="display-7">Добро пожаловать в профиль пользователя!</h1>
+                <hr class="my-4">
+                <p class="lead">Здесь вы можете создать новый запрос или посмотреть ваши запросы.</p>
+                <hr class="my-4">
+                <a class="btn btn-primary btn-lg" href="{{ url_for('create_request') }}" role="button">Создать запрос</a>
+                <a class="btn btn-secondary btn-lg" href="{{ url_for('user_requests') }}" role="button">Мои запросы</a>
+            {% endif %}
+            <a class="btn btn-danger btn-lg" href="{{ url_for('logout') }}" role="button">Выход</a>
+        {% else %}
+        <h1 class="display-7">Добро пожаловать на сайт технической поддержки!</h1>
+        <hr class="my-4">
+        <p class="lead">Чтобы продолжить войдите или зарегистрируйтесь.</p>
+        <hr class="my-4">
+            <a class="btn btn-primary btn-lg" href="{{ url_for('login') }}" role="button">Вход</a>
+            <a class="btn btn-secondary btn-lg" href="{{ url_for('register') }}" role="button">Регистрация</a>
+        {% endif %}
+    </div>
+{% endblock %}

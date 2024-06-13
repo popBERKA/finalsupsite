@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block title %}Мои запросы{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <h1>Мои запросы</h1>
+        <hr class="my-3">
+        <form method="GET" action="{{ url_for('active_chats') }}" class="form-inline mb-3">
+            <div class="amain"><a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">На главную</a></div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="status" class="sr-only">Статус</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="">Все</option>
+                    <option value="Ожидает ответа" {% if status_filter == 'Ожидает ответа' %}selected{% endif %}>Ожидает ответа</option>
+                    <option value="В работе" {% if status_filter == 'В работе' %}selected{% endif %}>В работе</option>
+                </select>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="subject" class="sr-only">Тема</label>
+                <input type="text" name="subject" id="subject" class="form-control" placeholder="Тема запроса" value="{{ subject_filter }}">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Фильтр</button>
+        </form>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Номер</th>
+                    <th>Тема запроса</th>
+                    <th>Статус</th>
+                    <th>Детали</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests.items %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.subject }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>
+                        <a href="{{ url_for('view_request', request_id=request.id) }}" class="btn btn-primary">Открыть чат</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if requests.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user_requests', page=requests.prev_num, status=status_filter, subject=subject_filter) }}">Предыдущая</a>
+                </li>
+                {% endif %}
+                {% for page_num in requests.iter_pages() %}
+                <li class="page-item {% if page_num == requests.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('user_requests', page=page_num, status=status_filter, subject=subject_filter) }}">{{ page_num }}</a>
+                </li>
+                {% endfor %}
+                {% if requests.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user_requests', page=requests.next_num, status=status_filter, subject=subject_filter) }}">Следующая</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% endblock %}

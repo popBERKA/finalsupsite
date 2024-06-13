@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% block title %}Все запросы{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <h1>Все запросы</h1>
+        <hr class="my-3">
+        <form method="GET" action="{{ url_for('admin_panel') }}" class="form-inline mb-3">
+            <div class="amain1"><a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">На главную</a> <a href="{{ url_for('download_requests') }}" class="btn btn-success mb-3">Выгрузить в Excel</a></div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="status" class="sr-only">Статус</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="">Все</option>
+                    <option value="Ожидает ответа" {% if status_filter == 'Ожидает ответа' %}selected{% endif %}>Ожидает ответа</option>
+                    <option value="В работе" {% if status_filter == 'В работе' %}selected{% endif %}>В работе</option>
+                    <option value="Выполнен" {% if status_filter == 'Выполнен' %}selected{% endif %}>Выполнен</option>
+                </select>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="subject" class="sr-only">Тема</label>
+                <input type="text" name="subject" id="subject" class="form-control" placeholder="Тема запроса" value="{{ subject_filter }}">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="user" class="sr-only">Пользователь</label>
+                <input type="text" name="user" id="user" class="form-control" placeholder="Пользователь" value="{{ user_filter }}">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Фильтр</button>
+        </form>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Номер</th>
+                    <th>Тема запроса</th>
+                    <th>Статус</th>
+                    <th>Пользователь</th>
+                    <th>Детали</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in support_requests.items %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.subject }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>{{ request.user.full_name }}</td>
+                    <td>
+                        <a href="{{ url_for('view_request', request_id=request.id) }}" class="btn btn-primary">Посмотреть чат</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if support_requests.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin_panel', page=support_requests.prev_num, status=status_filter, subject=subject_filter, user=user_filter) }}">Предыдущая</a>
+                </li>
+                {% endif %}
+                {% for page_num in support_requests.iter_pages() %}
+                <li class="page-item {% if page_num == support_requests.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin_panel', page=page_num, status=status_filter, subject=subject_filter, user=user_filter) }}">{{ page_num }}</a>
+                </li>
+                {% endfor %}
+                {% if support_requests.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('admin_panel', page=support_requests.next_num, status=status_filter, subject=subject_filter, user=user_filter) }}">Следующая</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% endblock %}

@@ -1,0 +1,32 @@
+<!-- create_request.html -->
+{% extends "layout.html" %}
+{% block title %}Создание запроса{% endblock %}
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2>Создание запроса</h2>
+            <hr class="my-3">
+            <form method="POST" action="{{ url_for('create_request') }}" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.subject.label(class="form-control-label") }}
+                    {{ form.subject(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.message.label(class="form-control-label") }}
+                    {{ form.message(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label">Прикрепить файл</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile" name="file">
+                        <label class="custom-file-label" for="customFile">Выберите файл</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }} <a href="{{ url_for('create_request') }}" class="btn btn-danger">Отмена</a> <a href="{{ url_for('index') }}" class="btn btn-secondary">Назад</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
